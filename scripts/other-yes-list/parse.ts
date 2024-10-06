@@ -8,11 +8,9 @@ export type Course = {
   /** The liberal studies categories satisfied by the course */
   categories: readonly string[];
 };
-
 export type CourseWithId = Course & {
   crseId: number;
 };
-
 enum Col {
   CoursePrefix,
   CourseNumber,

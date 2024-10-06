@@ -21,4 +21,4 @@ export async function writeOtherLiberalStudiesCourses(path) {
   await writeFile(`${path}otherYesCourses.json`, courses);
 }
 
-writeOtherLiberalStudiesCoursesJSON('../../src/assets/courses/');
+writeOtherLiberalStudiesCourses('./scripts/other-yes-list/');
