@@ -21,7 +21,7 @@ import chemERequirements, { chemEAdvisors } from './majors/chemE';
 import civilRequirements, { civilAdvisors } from './majors/ce';
 import commRequirements, { commAdvisors } from './majors/comm';
 import crpRequirements, { crpAdvisors } from './majors/crp';
-import csRequirements, { csAdvisors } from './majors/cs';
+import csRequirements, { csAdvisors, csMigrations } from './majors/cs';
 import deaRequirements, { deaAdvisors } from './majors/dea';
 import easRequirements, { easAdvisors } from './majors/eas';
 import economicsRequirements, { economicsAdvisors } from './majors/econ';
@@ -239,6 +239,7 @@ const json: RequirementsJson = {
       requirements: csRequirements,
       specializations: [MATH2940, CHEM2080],
       advisors: csAdvisors,
+      migrations: csMigrations,
       abbrev: 'CS',
     },
     DEA: {

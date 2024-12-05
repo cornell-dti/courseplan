@@ -2,7 +2,7 @@
 
 Access CoursePlan at [courseplan.io](https://courseplan.io)!
 
-CoursePlan is a four-year academic planner for Cornell undergraduates developed by the Digital Tech & Innovation. CoursePlan helps undergraduates track their courses and their requirements automatically depending on their college, major, and minor. It aims to allow students view the big picture of their time at Cornell.
+CoursePlan is a four-year academic planner for Cornell undergraduates developed by the Digital Tech & Innovation project team. CoursePlan helps undergraduates track their courses and their requirements automatically depending on their college, major, and minor. It aims to allow students view the big picture of their time at Cornell.
 
 View documentation in our [wiki](https://github.com/cornell-dti/course-plan/wiki).
 
