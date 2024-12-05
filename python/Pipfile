@@ -8,6 +8,10 @@ verify_ssl = true
 [packages]
 black = "23.9.1"
 pytest = "*"
+langchain = "*"
+openai = "*"
+numpy = "*"
+parsy = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.8"

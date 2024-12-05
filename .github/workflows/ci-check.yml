@@ -49,26 +49,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.8'
       - name: Install pip
-        run: |
-          export RUN_LANGCHAIN_TESTS=false
-          python -m pip install --upgrade pip setuptools wheel
-      - name: Install pipenv, black, and pytest
+        run: python -m pip install --upgrade pip setuptools wheel
+      - name: Install pipenv
         run: |
           pip install pipenv
+          pip install typing-extensions
       - name: Pipenv Install
         working-directory: python
         run: pipenv install
       - name: Check that pipenv is up to date
-        run: |
-          exit $(git status --porcelain | wc -l)
+        run: exit $(git status --porcelain | wc -l)
       - name: Run black linting
         working-directory: python
         run: pipenv run black . --check
       - name: Run black and tests
         working-directory: python
-        run: pipenv run pytest
+        run: |
+          export RUN_LANGCHAIN_TESTS=false
+          echo $RUN_LANGCHAIN_TESTS
+          pipenv run pytest
