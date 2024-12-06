@@ -1,4 +1,4 @@
-import { Course, CollegeOrMajorRequirement } from '../../requirements/types';
+import { Course, CollegeOrMajorRequirement, RequirementMigration } from '../../requirements/types';
 import {
   courseIsFWS,
   includesWithSingleRequirement,
@@ -10,7 +10,7 @@ import {
 import { AdvisorGroup } from '../../tools/advisors/types';
 import { lastNameRange, lastNameRanges } from '../../tools/advisors/checkers';
 
-const engineeringLiberalArtsGroups: string[][] = Object.values({
+const previousEngineeringLiberalArtsGroups: readonly string[][] = Object.values({
   'Group 1': [
     'CA-AAP',
     'CA-AG',
@@ -43,6 +43,41 @@ const engineeringLiberalArtsGroups: string[][] = Object.values({
   ],
   'Group 5': ['FL-AAP', 'FL-AG'],
   'Group 6': ['CE-EN'],
+});
+
+const currentEngineeringLiberalArtsGroups: readonly string[][] = Object.values({
+  'Group 1': [
+    'CA-AAP',
+    'CA-AG',
+    'CA-AS',
+    'CA-HE',
+    'LA-AAP',
+    'LA-AG',
+    'LA-AS',
+    'LAD-HE',
+    'ALC-AAP',
+    'ALC-AS',
+    'ALC-HA',
+    'SCD-AAP',
+    'SCD-HA',
+  ],
+  'Group 2': ['HA-AAP', 'HA-AG', 'HA-AS', 'HA-HE', 'HST-AAP', 'HST-AS', 'HST-HA'],
+  'Group 3': ['KCM-AAP', 'KCM-AG', 'KCM-AS', 'KCM-HE', 'ETM-AAP', 'ETM-AS', 'ETM-HA'],
+  'Group 4': [
+    'SBA-AAP',
+    'SBA-AG',
+    'SBA-AS',
+    'SBA-HE',
+    'SSC-AAP',
+    'SSC-AS',
+    'SSC-HA',
+    'GLC-AAP',
+    'GLC-AS',
+    'GLC-HA',
+  ],
+  'Group 5': ['FL-AAP', 'FL-AG'],
+  'Group 6': ['CE-EN'],
+  'Group 7': ['SCD-AS', 'D-AG'],
 });
 
 const engineeringRequirements: readonly CollegeOrMajorRequirement[] = [
@@ -129,7 +164,7 @@ const engineeringRequirements: readonly CollegeOrMajorRequirement[] = [
       'https://www.engineering.cornell.edu/students/undergraduate-students/advising/liberal-studies',
     checker: [
       (course: Course): boolean =>
-        engineeringLiberalArtsGroups.some(group =>
+        currentEngineeringLiberalArtsGroups.some(group =>
           group.some(distribution => hasCategory(course, distribution) ?? false)
         ) || courseIsForeignLang(course),
     ],
@@ -139,19 +174,30 @@ const engineeringRequirements: readonly CollegeOrMajorRequirement[] = [
     additionalRequirements: {
       'Courses must be from 3 groups.': {
         checker: [
-          ...engineeringLiberalArtsGroups.map(group => (course: Course): boolean =>
+          ...currentEngineeringLiberalArtsGroups.map(group => (course: Course): boolean =>
             group.some(distribution => hasCategory(course, distribution) ?? false)
           ),
         ],
         fulfilledBy: 'courses',
-        perSlotMinCount: [1, 1, 1, 1, 1, 1],
-        slotNames: ['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5', 'Group 6'],
+        perSlotMinCount: [1, 1, 1, 1, 1, 1, 1],
+        slotNames: ['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5', 'Group 6', 'Group 7'],
         minNumberOfSlots: 3,
+      },
+      'One course of 3 or more credits must come from Group 7.': {
+        checker: [
+          (course: Course): boolean =>
+            currentEngineeringLiberalArtsGroups[
+              currentEngineeringLiberalArtsGroups.length - 1
+            ].some(distribution => hasCategory(course, distribution) ?? false),
+        ],
+        fulfilledBy: 'courses',
+        perSlotMinCount: [1],
+        slotNames: ['Course'],
       },
       'Courses must have at least 18 credits.': {
         checker: [
           (course: Course): boolean =>
-            engineeringLiberalArtsGroups.some(group =>
+            currentEngineeringLiberalArtsGroups.some(group =>
               group.some(distribution => hasCategory(course, distribution) ?? false)
             ) || courseIsForeignLang(course),
         ],
@@ -164,7 +210,7 @@ const engineeringRequirements: readonly CollegeOrMajorRequirement[] = [
             const { catalogNbr } = course;
             return (
               !ifCodeMatch(catalogNbr, '1***') &&
-              (engineeringLiberalArtsGroups.some(group =>
+              (currentEngineeringLiberalArtsGroups.some(group =>
                 group.some(distribution => hasCategory(course, distribution) ?? false)
               ) ||
                 courseIsForeignLang(course))
@@ -276,3 +322,66 @@ export const engineeringAdvisors: AdvisorGroup = {
   ],
   source: 'https://www.engineering.cornell.edu/students/undergraduate-students/advising/meet-staff',
 };
+
+export const engMigrations: RequirementMigration[] = [
+  {
+    entryYear: 2023,
+    type: 'Modify',
+    fieldName: 'Liberal Studies: 6 courses',
+    newValue: {
+      name: 'Liberal Studies: 6 courses',
+      description: 'A minimum of six courses must be taken.',
+      source:
+        'https://www.engineering.cornell.edu/students/undergraduate-students/advising/liberal-studies',
+      checker: [
+        (course: Course): boolean =>
+          previousEngineeringLiberalArtsGroups.some(group =>
+            group.some(distribution => hasCategory(course, distribution) ?? false)
+          ) || courseIsForeignLang(course),
+      ],
+      fulfilledBy: 'courses',
+      perSlotMinCount: [6],
+      slotNames: ['Course'],
+      additionalRequirements: {
+        'Courses must be from 3 groups.': {
+          checker: [
+            ...previousEngineeringLiberalArtsGroups.map(group => (course: Course): boolean =>
+              group.some(distribution => hasCategory(course, distribution) ?? false)
+            ),
+          ],
+          fulfilledBy: 'courses',
+          perSlotMinCount: [1, 1, 1, 1, 1, 1],
+          slotNames: Object.keys(previousEngineeringLiberalArtsGroups),
+          minNumberOfSlots: 3,
+        },
+        'Courses must have at least 18 credits.': {
+          checker: [
+            (course: Course): boolean =>
+              previousEngineeringLiberalArtsGroups.some(group =>
+                group.some(distribution => hasCategory(course, distribution) ?? false)
+              ) || courseIsForeignLang(course),
+          ],
+          fulfilledBy: 'credits',
+          perSlotMinCount: [18],
+        },
+        'Two courses must be at the 2000 level or higher.': {
+          checker: [
+            (course: Course): boolean => {
+              const { catalogNbr } = course;
+              return (
+                !ifCodeMatch(catalogNbr, '1***') &&
+                (previousEngineeringLiberalArtsGroups.some(group =>
+                  group.some(distribution => hasCategory(course, distribution) ?? false)
+                ) ||
+                  courseIsForeignLang(course))
+              );
+            },
+          ],
+          fulfilledBy: 'courses',
+          perSlotMinCount: [2],
+          slotNames: ['Course'],
+        },
+      },
+    },
+  },
+];
