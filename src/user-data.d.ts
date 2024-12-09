@@ -18,6 +18,8 @@ type FirestoreSemesterCourse = {
   readonly creditRange: readonly [number, number];
   readonly semesters: readonly string[];
   readonly color: string;
+  readonly note?: string | null;
+  readonly lastUpdated?: Timestamp | null; // NB: the Timestamp here is deliberately left untyped — importing from Firestore causes all sorts of namespace issues.
 };
 
 type FirestoreSemesterPlaceholder = {

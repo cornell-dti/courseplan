@@ -1,6 +1,16 @@
 <template>
   <div class="courseMenu">
     <div class="courseMenu-content">
+      <div class="courseMenu-section" @click="openNoteModal">
+        <div class="courseMenu-left">
+          <img
+            class="courseMenu-icon"
+            src="@/assets/images/noteIconSmall.svg"
+            alt="note course icon"
+          />
+          <span class="courseMenu-text">Note</span>
+        </div>
+      </div>
       <div
         class="courseMenu-section"
         v-if="saveCourseIconVisible"
@@ -175,6 +185,7 @@ export default defineComponent({
     'delete-course': () => true,
     'open-edit-color-modal': (color: string) => typeof color === 'string',
     'edit-course-credit': (credit: number) => typeof credit === 'number',
+    'open-note-modal': () => true,
   },
   methods: {
     toggleDisplayColors() {
@@ -249,6 +260,9 @@ export default defineComponent({
         }
       }
       return creditArray;
+    },
+    openNoteModal() {
+      this.$emit('open-note-modal');
     },
   },
 });
