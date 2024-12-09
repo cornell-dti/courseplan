@@ -21,7 +21,7 @@
         />
         <div
           class="onboarding-dropdown-placeholder college-major-minor-arrow"
-          :style="{ borderTopColor: arrowColor }"
+          :style="{ borderTopColor: arrowColor, transform: arrowDirection }"
         ></div>
       </div>
       <div class="onboarding-dropdown-content" v-if="shown">
@@ -52,7 +52,12 @@
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
 import { clickOutside } from '@/utilities';
-import { inactiveGray, yuxuanBlue, lightPlaceholderGray } from '@/assets/constants/scss-variables';
+import {
+  inactiveGray,
+  yuxuanBlue,
+  lightPlaceholderGray,
+  upsideDown,
+} from '@/assets/constants/scss-variables';
 
 export default defineComponent({
   props: {
@@ -85,6 +90,7 @@ export default defineComponent({
       stopClose: false,
       boxBorder: '',
       arrowColor: '',
+      arrowDirection: '',
       placeholderColor: this.choice !== '' ? lightPlaceholderGray : '',
     };
   },
@@ -114,6 +120,7 @@ export default defineComponent({
         // clicked box when content shown. So then hide content
         this.boxBorder = inactiveGray;
         this.arrowColor = inactiveGray;
+        this.arrowDirection = '';
         this.curQuery = this.prevQuery;
       } else {
         box.focus();
@@ -121,6 +128,7 @@ export default defineComponent({
         this.curQuery = '';
         this.boxBorder = yuxuanBlue;
         this.arrowColor = yuxuanBlue;
+        this.arrowDirection = upsideDown;
       }
 
       // scroll the bottom of the graduation year dropdown to scrollBottomToElement
@@ -141,12 +149,14 @@ export default defineComponent({
         this.curQuery = this.prevQuery;
         this.boxBorder = inactiveGray;
         this.arrowColor = inactiveGray;
+        this.arrowDirection = '';
       }
     },
     onSelect([acronym, name]: [string, string]) {
       const box = this.$refs.selectbox as HTMLInputElement;
       this.shown = false;
       this.arrowColor = inactiveGray;
+      this.arrowDirection = '';
       this.boxBorder = inactiveGray;
       this.placeholderColor = lightPlaceholderGray;
       this.$emit('on-select', acronym);

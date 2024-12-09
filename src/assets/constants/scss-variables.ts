@@ -14,3 +14,4 @@ export const largeBreakpoint = '976px';
 export const veryLargeBreakpoint = '1347px';
 export const largerBreakpoint = '1407px';
 export const largestBreakpoint = '1455px';
+export const upsideDown = 'rotate(180deg)';

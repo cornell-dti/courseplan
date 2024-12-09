@@ -124,7 +124,7 @@
               <onboarding-basic-multi-dropdown
                 :availableChoices="majors"
                 :dropdownChoices="majorAcronyms"
-                add-dropdown-text="+ another major"
+                add-dropdown-text="+ Another major"
                 @on-select="selectMajor"
                 @on-remove="removeMajor"
                 @on-add="addMajor"
@@ -132,7 +132,7 @@
               <div class="requestForm">
                 *Don't see your major/minor? We are working hard to add them soon! Get updated when
                 we add it by signing up
-                <a href="https://forms.gle/MDvVDoRapUp2VeBb9" target="_blank" class="link">here</a>
+                <a href="https://forms.gle/MDvVDoRapUp2VeBb9" target="_blank" class="link">here</a>.
               </div>
             </div>
           </div>
@@ -145,7 +145,7 @@
               <onboarding-basic-multi-dropdown
                 :availableChoices="minors"
                 :dropdownChoices="minorAcronyms"
-                add-dropdown-text="+ another minor"
+                add-dropdown-text="+ Another minor"
                 @on-select="selectMinor"
                 @on-remove="removeMinor"
                 @on-add="addMinor"

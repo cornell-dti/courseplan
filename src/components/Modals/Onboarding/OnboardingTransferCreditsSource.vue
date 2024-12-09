@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="onboarding-addRemoveWrapper">
-        <button class="onboarding-add" @click="$emit('on-add', examType)">+ another subject</button>
+        <button class="onboarding-add" @click="$emit('on-add', examType)">+ Another subject</button>
       </div>
     </div>
   </div>

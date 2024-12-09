@@ -115,7 +115,6 @@ export default defineComponent({
     border: none;
     display: flex;
     align-items: center;
-    padding-bottom: 0.5rem;
     &--label {
       :hover > & {
         color: $viewLabelGray;

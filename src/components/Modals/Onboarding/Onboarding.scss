@@ -8,7 +8,7 @@ input {
   background-color: none;
 }
 .onboarding {
-  padding: 1rem;
+  padding: 2rem 1rem;
   width: 100%;
 
   &-selectWrapperRow {
@@ -313,7 +313,6 @@ input {
     border-top: 1px solid #e5e5e5;
     box-sizing: border-box;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 9px;
     padding-top: 1rem;
     height: 8rem;
 
@@ -370,12 +369,13 @@ input {
     }
 
     &--disabled {
-      opacity: 0.3;
+      opacity: 0.6;
       border: 1px solid $sangBlue;
       background-color: $disabledGray;
 
       &:hover {
-        opacity: 0.3;
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
   }
@@ -389,10 +389,10 @@ input {
   }
   &-select {
     background: $white;
-    border: 1px solid $inactiveGray;
+    border: 0.5px solid $inactiveGray;
 
     box-sizing: border-box;
-    border-radius: 1px;
+    border-radius: 2px;
     width: 100%;
     font-size: 14px;
     line-height: 17px;
@@ -495,11 +495,12 @@ input {
     width: inherit;
     background: $white;
     box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.25);
-    border-radius: 7px;
+    border: 0.5px solid $inactiveGray;
+    border-radius: 0px 0px 2px 2px;
     max-height: 150px;
     overflow: auto;
 
-    margin-top: 6px;
+    margin-top: 5px;
 
     &-item {
       height: 2.25rem;
