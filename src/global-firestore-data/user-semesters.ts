@@ -52,21 +52,23 @@ export const setOrderByNewest = (orderByNewest: boolean): void => {
 };
 
 /**
- * Updates the 'All'/Default Collection with all unique courses from all collections.
- *
+ * Updates the 'All'/Default Collection with courses based on the following logic:
+ * - Add unique courses from specific collections to the default collection.
+ * - If a course is removed from the default collection, it is removed from all specific collections.
+ * Note: Does not remove a course form the default collection if that course is removed in all specfic collections.
  */
 export const editDefaultCollection = (): void => {
   const allCollections = store.state.savedCourses;
   const defaultCollectionName = 'All';
 
-  const uniqueCourses = new Set<FirestoreSemesterCourse>();
+  const uniqueCoursesMap = new Map<string, FirestoreSemesterCourse>();
   allCollections.forEach(collection => {
-    if (collection.name !== defaultCollectionName) {
-      collection.courses.forEach(course => {
-        uniqueCourses.add(course);
-      });
-    }
+    collection.courses.forEach(course => {
+      uniqueCoursesMap.set(course.name, course);
+    });
   });
+
+  const uniqueCourses = new Set<FirestoreSemesterCourse>(uniqueCoursesMap.values());
 
   editCollection(defaultCollectionName, oldCollection => ({
     ...oldCollection,

@@ -162,6 +162,11 @@ export default defineComponent({
         collection => !this.checkedCollections.includes(collection)
       );
 
+      // If no specific collections were selected, and no prevoius selections were removed, add to 'All'
+      if (addedToCollections.length === 0 && deletedFromCollections.length === 0) {
+        console.log('added to All');
+        addedToCollections.push('All');
+      }
       this.$emit('save-course', addedToCollections, deletedFromCollections);
 
       this.closeCurrentModal();
