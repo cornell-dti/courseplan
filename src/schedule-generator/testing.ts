@@ -3,7 +3,13 @@ import Course from './course-unit';
 import GeneratorRequest from './generator-request';
 import ScheduleGenerator from './algorithm';
 
+/**
+ * A helper class used for backend / ts-node-only testing of the schedule generator algorithm.
+ */
 class Testing {
+  /**
+   * A helper function that runs the schedule generator algorithm with some test data.
+   */
   public static main(): void {
     // Create some requirements
     const techElective = new Requirement('Technical Elective', 'College', 'CoE');
@@ -20,8 +26,8 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Wednesday'],
           start: '10:00 AM',
-          end: '11:30 AM',
-        },
+          end: '11:30 AM'
+        }
       ],
       ['Fall', 'Spring'],
       [coreClass, techElective]
@@ -35,13 +41,13 @@ class Testing {
         {
           daysOfTheWeek: ['Tuesday', 'Thursday'],
           start: '11:30 AM',
-          end: '1:00 PM',
+          end: '1:00 PM'
         },
         {
           daysOfTheWeek: ['Friday'],
           start: '3:00 PM',
-          end: '5:30 PM',
-        },
+          end: '5:30 PM'
+        }
       ],
       ['Fall', 'Spring'],
       [coreClass, techElective]
@@ -55,13 +61,13 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Wednesday'],
           start: '10:00 AM',
-          end: '11:30 AM',
+          end: '11:30 AM'
         },
         {
           daysOfTheWeek: ['Thursday'],
           start: '11:30 AM',
-          end: '1:00 PM',
-        },
+          end: '1:00 PM'
+        }
       ],
       ['Fall'],
       [techElective]
@@ -75,13 +81,13 @@ class Testing {
         {
           daysOfTheWeek: ['Tuesday', 'Thursday'],
           start: '12:20 PM',
-          end: '1:10 PM',
+          end: '1:10 PM'
         },
         {
           daysOfTheWeek: ['Monday', 'Friday'],
           start: '2:30 PM',
-          end: '4:30 PM',
-        },
+          end: '4:30 PM'
+        }
       ],
       ['Fall', 'Spring'],
       [engrdReq, probabilityReq]
@@ -95,8 +101,8 @@ class Testing {
         {
           daysOfTheWeek: ['Sunday'],
           start: '7:00 AM',
-          end: '11:00 AM',
-        },
+          end: '11:00 AM'
+        }
       ],
       ['Fall', 'Spring'],
       [coreClass]
@@ -110,8 +116,8 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Saturday'],
           start: '4:30 PM',
-          end: '6:00 PM',
-        },
+          end: '6:00 PM'
+        }
       ],
       ['Spring'],
       [techElective]
@@ -125,13 +131,13 @@ class Testing {
         {
           daysOfTheWeek: ['Tuesday'],
           start: '1:00 PM',
-          end: '2:30 PM',
+          end: '2:30 PM'
         },
         {
           daysOfTheWeek: ['Monday', 'Friday'],
           start: '12:00 PM',
-          end: '3:00 PM',
-        },
+          end: '3:00 PM'
+        }
       ],
       ['Fall', 'Spring'],
       [techElective]
@@ -145,8 +151,8 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Wednesday', 'Friday'],
           start: '10:00 AM',
-          end: '11:30 AM',
-        },
+          end: '11:30 AM'
+        }
       ],
       ['Spring'],
       [coreClass, probabilityReq]
@@ -160,13 +166,13 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Tuesday', 'Wednesday'],
           start: '11:30 AM',
-          end: '1:00 PM',
+          end: '1:00 PM'
         },
         {
           daysOfTheWeek: ['Thursday', 'Friday'],
           start: '1:00 PM',
-          end: '2:30 PM',
-        },
+          end: '2:30 PM'
+        }
       ],
       ['Fall'],
       [engrdReq, techElective]
@@ -181,13 +187,13 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Wednesday', 'Friday'],
           start: '8:55 AM',
-          end: '9:45 AM',
+          end: '9:45 AM'
         },
         {
           daysOfTheWeek: ['Tuesday', 'Thursday'],
           start: '11:40 AM',
-          end: '12:30 PM',
-        },
+          end: '12:30 PM'
+        }
       ],
       ['Spring'],
       [techElective]
@@ -202,13 +208,13 @@ class Testing {
         {
           daysOfTheWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
           start: '8:55 AM',
-          end: '9:45 AM',
+          end: '9:45 AM'
         },
         {
           daysOfTheWeek: ['Saturday'],
           start: '11:40 AM',
-          end: '12:30 PM',
-        },
+          end: '12:30 PM'
+        }
       ],
       ['Fall'],
       [techElective, probabilityReq, engrdReq, coreClass]
@@ -225,14 +231,15 @@ class Testing {
       randomCourse2,
       randomCourse3,
       randomCourse4,
-      randomCourse5,
+      randomCourse5
     ];
 
     const requirements: Requirement[] = [
       techElective,
       coreClass,
       probabilityReq,
-      engrdReq, // Assuming you also want to include this in the requirements as mentioned, though not explicitly added in the original Java code testing request.
+      engrdReq // Assuming you also want to include this in the requirements as mentioned,
+      // though not explicitly added in the original Java code testing request.
     ];
 
     // Create request
