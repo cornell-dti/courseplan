@@ -19,6 +19,7 @@ import biomedicalEngineeringRequirements, { biomedicalEngineeringAdvisors } from
 import chemRequirements, { chemAdvisors } from './majors/chem';
 import chemERequirements, { chemEAdvisors } from './majors/chemE';
 import civilRequirements, { civilAdvisors } from './majors/ce';
+import collSRequirements, {collSAdvisors} from './majors/collS';
 import commRequirements, { commAdvisors } from './majors/comm';
 import crpRequirements, { crpAdvisors } from './majors/crp';
 import csRequirements, { csAdvisors } from './majors/cs';
@@ -218,6 +219,13 @@ const json: RequirementsJson = {
       requirements: chemERequirements,
       advisors: chemEAdvisors,
       abbrev: 'ChemE',
+    },
+    COLLS:{
+      name: 'College Scholar',
+      schools: ['AS1', 'AS2'],
+      requirements: collSRequirements,
+      advisors: collSAdvisors,
+      abbrev: 'CollS',
     },
     COMM: {
       name: 'Communication',
