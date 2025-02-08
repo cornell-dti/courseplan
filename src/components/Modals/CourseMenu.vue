@@ -7,6 +7,8 @@
             class="courseMenu-icon"
             src="@/assets/images/noteIconSmall.svg"
             alt="note course icon"
+            width="12"
+            height="11"
           />
           <span class="courseMenu-text">Note</span>
         </div>
@@ -277,7 +279,7 @@ export default defineComponent({
   position: absolute;
   right: -3rem;
   top: 2rem;
-  z-index: 1;
+  z-index: 1000;
 
   &-content {
     background: $white;

@@ -1,6 +1,13 @@
 <template>
-  <div class="note" :class="{ expanded: isExpanded }" :style="noteStyle" @click="handleClick">
-    <div class="note-content" :class="{ visible: isExpanded, editing: isEditing }">
+  <div class="note" :style="noteStyle" @click="handleClick">
+    <div
+      class="note-content"
+      :class="{
+        visibleEmpty: isExpanded && initialNote === '',
+        visible: isExpanded,
+        editing: isEditing,
+      }"
+    >
       <!-- NOTE: the disabled attribute is used to prevent the user from being able to edit the note
       when it is expanded, but the edit icon has not been pressed. This only applies when the note
       is not empty (already had something written in it previously and read from the database). -->
@@ -13,9 +20,20 @@
         @input="handleInput"
       />
       <img
+        v-if="isExpanded && initialNote === ''"
         src="@/assets/images/notes/arrow.svg"
         alt="Arrow icon"
         class="note-icon"
+        :style="{ opacity: isDisabled || note.trim() === '' ? '0.5' : '1' }"
+        :data-id="noteId"
+        @click.stop="saveNote"
+      />
+      <img
+        v-if="isEditing && initialNote !== ''"
+        src="@/assets/images/notes/checkmark.svg"
+        alt="Checkmark icon"
+        class="note-icon"
+        :data-id="noteId"
         @click.stop="saveNote"
       />
     </div>
@@ -43,15 +61,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import { Timestamp } from 'firebase/firestore';
-import { coursesColorSet } from '@/assets/constants/colors';
 
 export default defineComponent({
   name: 'Note',
   props: {
-    initialTranslateY: { type: String, default: '-50px', required: true },
-    expandedTranslateY: { type: String, default: '-10px', required: true },
+    // NOTE: each node has an ID (just the courseID)
+    // Each note has three types of heights and translateY values: initial, expandedInitial (empty input), and expanded. For now,
+    // all translateY values are the same, but this can be changed in the future.
+    noteId: { type: String, required: true },
+    initialTranslateY: { type: String, default: '-10px' },
+    expandedInitialTranslateY: { type: String, default: '-10px' },
+    expandedTranslateY: { type: String, default: '-10px' },
+    initialHeight: { type: String, default: '20px' },
+    expandedInitialHeight: { type: String, default: '40px' },
+    expandedHeight: { type: String, default: '60px' },
     width: { type: String, default: '200px' },
     color: { type: String, default: '#a8e6cf' },
     initialNote: { type: String, default: '' },
@@ -75,15 +100,41 @@ export default defineComponent({
     expand(newVal) {
       if (newVal) this.isExpanded = true;
     },
+    isEditing: 'updateSvgState',
+    isDisabled: 'updateSvgState',
+    note: 'updateSvgState', // Update SVG whenever note changes
   },
   computed: {
-    noteStyle() {
+    noteStyle(): Record<string, string> {
+      // Parse the heights and translate values
+      const trueExpandedTranslateY =
+        this.isExpanded && this.initialNote === '' // note is empty
+          ? this.expandedInitialTranslateY
+          : this.expandedTranslateY;
+
+      const trueExpandedHeight =
+        this.isExpanded && this.initialNote === '' // note is empty
+          ? this.expandedInitialHeight
+          : this.expandedHeight;
+
+      const translateY = this.isExpanded
+        ? parseInt(trueExpandedTranslateY, 10)
+        : parseInt(this.initialTranslateY, 10);
+
+      const baseHeight = this.isExpanded
+        ? parseInt(trueExpandedHeight, 10)
+        : parseInt(this.initialHeight, 10);
+
+      const visibleHeight = baseHeight + Math.max(0, -translateY); // Add the visible part of the translated note
+      console.log('visibleHeight', visibleHeight);
+
       return {
-        transform: `translateX(-50%) translateY(${
-          this.isExpanded ? this.expandedTranslateY : this.initialTranslateY
-        })`,
+        transform: `translateX(-50%) translateY(${translateY}px)`,
+        height: `${visibleHeight}px`, // The height of the note itself
         width: this.width,
-        backgroundColor: this.getLighterColor(this.color),
+        position: 'relative' as const,
+        marginBottom: '-10px',
+        backgroundColor: this.getLighterColor(this.color, 0.8),
       };
     },
     // Displays
@@ -101,11 +152,16 @@ export default defineComponent({
 
       return `${date.getMonth() + 1}/${date.getDate()}`;
     },
+    isDisabled() {
+      // Disabled when not editing or when input is empty
+      return (!this.isEditing && this.initialNote !== '') || this.note.trim() === '';
+    },
   },
   methods: {
     handleClick() {
       if (!this.isExpanded) {
         this.isExpanded = true;
+        this.$emit('note-state-change', true);
       }
     },
     startEditing() {
@@ -113,6 +169,7 @@ export default defineComponent({
       this.isExpanded = true;
     },
     saveNote() {
+      if (this.isDisabled) return;
       this.$emit('save-note', this.note);
       this.isDirty = false;
       this.isEditing = false;
@@ -121,11 +178,48 @@ export default defineComponent({
       if (this.isExpanded) {
         this.isExpanded = false;
         this.isEditing = false;
+        this.$emit('note-state-change', false);
       }
     },
-    getLighterColor(color: string) {
-      const colorObj = coursesColorSet.find(c => c.hex.toUpperCase() === color.toUpperCase());
-      return colorObj ? colorObj.lighterHex : color;
+    // getLighterColor(color: string) {
+    //   const colorObj = coursesColorSet.find(c => c.hex.toUpperCase() === color.toUpperCase());
+    //   return colorObj ? colorObj.lighterHex : color;
+    // },
+    /**
+     * Lighten a color in hex code by a percentage
+     * @param {string} unconvertedColor - The color to lighten in hex code
+     * @param {number} percentage - The percentage to lighten the color by (i.e: light by 80%)
+     */
+    getLighterColor(unconvertedColor: string, percentage: number) {
+      const hexColor = unconvertedColor.replace('#', '');
+      // Convert each color channel and lighten it
+      const lightenedHex = hexColor
+        .match(/.{2}/g)
+        ?.map(channel => {
+          // Convert channel from HEX to decimal
+          const decimal = parseInt(channel, 16);
+          // Lighten the channel
+          const lightened = Math.min(255, Math.floor(decimal + (255 - decimal) * percentage));
+          // Convert back to HEX, ensuring two characters
+          return lightened.toString(16).padStart(2, '0');
+        })
+        .join('');
+      return `#${lightenedHex}`;
+    },
+    updateSvgState() {
+      this.updateSvgColor(this.noteId);
+    },
+    // Note: this is a dynamic style update, so nextTick is used to ensure the SVG element is rendered
+    updateSvgColor(noteId: string) {
+      const color = this.isDisabled ? 'grey' : this.color;
+      const opacity = this.isDisabled ? '0.5' : '1';
+
+      nextTick(() => {
+        const svgElement = document.querySelector(`.note-icon[data-id="${noteId}"]`);
+        if (!svgElement) return;
+        (svgElement as HTMLElement).style.setProperty('--svg-filter-color', color);
+        (svgElement as HTMLElement).style.setProperty('opacity', opacity);
+      });
     },
     handleInput() {
       this.isDirty = this.note !== this.initialNote;
@@ -133,55 +227,47 @@ export default defineComponent({
   },
 });
 </script>
-
 <style scoped>
 .note {
-  box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.055);
-  position: absolute;
+  box-shadow: -4px -4px 10px 4px rgba(160, 91, 91, 0.055);
   left: 50%;
-  transform: translateX(-50%);
-  height: 80px;
   border-radius: 12.49px;
   cursor: pointer;
   z-index: 0;
-  transition: transform 0.3s ease, filter 0.3s ease;
+  transition: transform 0.3s ease, height 0.3s ease, filter 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding-bottom: 10px;
   overflow: hidden;
 }
-
-.note.expanded {
-  height: 80px;
-}
-
 .note-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  padding-top: 15px;
-  padding-left: 10px;
+  padding: 5px 0px 10px 10px;
   opacity: 0;
   transform: translateY(100%);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
 .note-content.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(-15px);
+}
+.note-content.visibleEmpty {
+  opacity: 1;
+  transform: translateY(0px);
 }
 
 .note-input {
   flex: 1;
+  padding: 0;
   border: none;
   outline: none;
   background-color: transparent;
   color: #555;
   font-size: 14.48px;
   font-family: inherit;
-  padding: 5px 0;
 }
 
 .note-icon {
@@ -194,10 +280,12 @@ export default defineComponent({
   cursor: pointer;
   transition: filter 0.3s ease;
   margin-right: 10px;
-}
+  --svg-filter-color: grey; /* Default color */
+  filter: drop-shadow(0 0 0 var(--svg-filter-color)) saturate(5);
 
-.note-icon:hover {
-  filter: brightness(0.7);
+  &:hover {
+    filter: opacity(0.5) drop-shadow(0 0 0 var(--svg-filter-color));
+  }
 }
 
 .note-footer {

@@ -271,7 +271,6 @@ export default defineComponent({
   &-wrapper {
     display: flex;
     justify-content: center;
-
     margin-bottom: 1.5rem;
     padding: 0 0.25rem;
   }

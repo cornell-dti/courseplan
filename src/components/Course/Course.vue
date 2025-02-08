@@ -80,35 +80,35 @@
           </div>
         </div>
       </div>
-      <course-menu
-        v-if="menuOpen"
-        :courseObj="courseObj"
-        :semesterIndex="semesterIndex"
-        :isCompact="compact"
-        :courseColor="courseObj.color"
-        :courseCode="courseObj.code"
-        @open-note-modal="openNoteModal"
-        @open-edit-color-modal="openEditColorModal"
-        @delete-course="deleteCourse"
-        @edit-course-credit="editCourseCredit"
-        @open-save-course-modal="openSaveCourseModal"
-        :getCreditRange="getCreditRange || []"
-        v-click-outside="closeMenuIfOpen"
-      />
     </div>
+    <course-menu
+      v-if="menuOpen"
+      :courseObj="courseObj"
+      :semesterIndex="semesterIndex"
+      :isCompact="compact"
+      :courseColor="courseObj.color"
+      :courseCode="courseObj.code"
+      @open-note-modal="openNoteModal"
+      @open-edit-color-modal="openEditColorModal"
+      @delete-course="deleteCourse"
+      @edit-course-credit="editCourseCredit"
+      @open-save-course-modal="openSaveCourseModal"
+      :getCreditRange="getCreditRange || []"
+      v-click-outside="closeMenuIfOpen"
+    />
     <Note
       v-if="isNoteVisible"
       class="note"
-      :initialTranslateY="'-67px'"
-      :expandedTranslateY="'-35px'"
       :width="'calc(102.8% - 10px)'"
       :color="cssVars['--bg-color']"
       :initialNote="courseObj.note || ''"
       :lastUpdated="courseObj.lastUpdated"
       @save-note="saveNote"
       @open-delete-note-modal="openDeleteNoteModal"
+      @note-state-change="handleNoteStateChange"
       ref="note"
       v-click-outside="handleClickOutsideNote"
+      :noteId="`course-${courseObj.uniqueID}`"
     />
   </div>
 </template>
@@ -137,7 +137,7 @@ interface MinimalNoteComponent {
   isDirty: boolean;
   isExpanded: boolean;
   collapseNote: () => void;
-  expandNote: () => void;
+  expandNote: () => void; // Note: This function does not exist in the Note component, but is used here.
 }
 
 export default defineComponent({
@@ -177,6 +177,8 @@ export default defineComponent({
     'save-note': (uniqueID: number, note: string) =>
       typeof uniqueID === 'number' && typeof note === 'string',
     'open-delete-note-modal': (uniqueID: number) => typeof uniqueID === 'number',
+    'note-state-change': (uniqueID: number, isExpanded: boolean) =>
+      typeof uniqueID === 'number' && typeof isExpanded === 'boolean',
   },
   data() {
     return {
@@ -363,6 +365,9 @@ export default defineComponent({
     openDeleteNoteModal() {
       this.$emit('open-delete-note-modal', this.courseObj.uniqueID);
     },
+    handleNoteStateChange(isExpanded: boolean) {
+      this.$emit('note-state-change', this.courseObj.uniqueID, isExpanded);
+    },
   },
   directives: {
     'click-outside': clickOutside,
@@ -387,7 +392,6 @@ export default defineComponent({
 
 .course-container {
   position: relative;
-  padding-bottom: 20px;
 }
 
 // Emulates a slight side-to-side sway à la Figma micro-interaction.
@@ -417,7 +421,6 @@ export default defineComponent({
 .course {
   box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.055);
   position: relative;
-  z-index: 1;
   box-sizing: border-box;
   border-radius: 0.5rem;
   display: flex;
@@ -425,6 +428,7 @@ export default defineComponent({
   background-color: $white;
   height: 5.625rem;
   cursor: grab;
+  z-index: 1;
 
   &:hover {
     background: $white;
@@ -558,20 +562,21 @@ export default defineComponent({
 .active {
   border: 1px solid $yuxuanBlue;
 }
-.rectangle {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%) translateY(-65px);
-  width: calc(106% - #{$colored-grabber-width});
-  height: 80px;
-  background-color: #a8e6cf;
-  border-radius: 12.49px;
-  cursor: pointer;
-  z-index: 0;
-  transition: transform 0.3s ease;
-}
+// Hannah's note: are these even needed?
+// .rectangle {
+//   position: absolute;
+//   left: 50%;
+//   transform: translateX(-50%) translateY(-65px);
+//   width: calc(106% - #{$colored-grabber-width});
+//   height: 80px;
+//   background-color: #a8e6cf;
+//   border-radius: 12.49px;
+//   cursor: pointer;
+//   z-index: 0;
+//   transition: transform 0.3s ease;
+// }
 
-.rectangle.expanded {
-  transform: translateX(-50%) translateY(0px);
-}
+// .rectangle.expanded {
+//   transform: translateX(-50%) translateY(0px);
+// }
 </style>

@@ -5,6 +5,7 @@ export const reviewColors = {
 };
 
 export const coursesColorSet = [
+  // note: can delete lighterhex now
   {
     text: 'Red',
     hex: '#FF3B30',

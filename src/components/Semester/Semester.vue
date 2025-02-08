@@ -1,7 +1,9 @@
 <template>
   <div
     class="semester"
-    :class="{ 'semester--compact': compact }"
+    :class="{
+      'semester--compact': compact,
+    }"
     data-intro-group="pageTour"
     data-step="3"
     :data-intro="walkthroughText()"
@@ -120,6 +122,7 @@
                 @add-collection="addCollection"
                 @edit-collection="editCollection"
                 @open-delete-note-modal="openDeleteNoteModal"
+                @note-state-change="handleNoteStateChange"
               />
               <placeholder
                 v-else
@@ -240,6 +243,8 @@ export default defineComponent({
         Winter: winter,
         Summer: summer,
       },
+      expandedNotes: new Map<number, boolean>(), // Track expanded state of notes by course uniqueID
+      isNoteTransitioning: false,
     };
   },
   props: {
@@ -352,7 +357,20 @@ export default defineComponent({
       if (this.compact) {
         factor = 2.6;
       }
-      return (this.courses.length + 1 + extraIncrementer) * factor;
+
+      // Add extra height for courses with visible notes
+      const extraNoteHeight = this.courses.reduce((acc, course) => {
+        if (!isPlaceholderCourse(course) && course.note) {
+          const isExpanded = this.expandedNotes.get(course.uniqueID);
+          if (isExpanded) {
+            return acc + 3.5; // Expanded note height
+          }
+          return acc + 1.0; // Collapsed but visible note height
+        }
+        return acc;
+      }, 0);
+
+      return (this.courses.length + 1 + extraIncrementer) * factor + extraNoteHeight;
     },
     creditString() {
       let credits = 0;
@@ -726,6 +744,18 @@ export default defineComponent({
     walkthroughText() {
       return `<div class="introjs-tooltipTop"><div class="introjs-customTitle">Add Classes to your Schedule</div><div class="introjs-customProgress">3/4</div>
       </div><div class = "introjs-bodytext">Press "+ Course" to add classes! Edit semesters using the ellipses on the top right and drag courses between semesters.</div>`;
+    },
+    handleNoteStateChange(courseUniqueID: number, isExpanded: boolean) {
+      // Set transitioning flag
+      this.isNoteTransitioning = true;
+
+      // Update note state
+      this.expandedNotes.set(courseUniqueID, isExpanded);
+
+      // Remove transitioning flag after animation completes
+      setTimeout(() => {
+        this.isNoteTransitioning = false;
+      }, 300); // Match this with your transition duration
     },
   },
   directives: {

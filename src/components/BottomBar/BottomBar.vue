@@ -65,7 +65,7 @@ export default defineComponent({
 .bottombar {
   display: flex;
   flex-direction: column;
-  z-index: 1;
+  z-index: 2;
   position: fixed;
   width: calc(100vw - 29.5rem);
   margin-left: 29.5rem;
